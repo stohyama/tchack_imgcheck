@@ -5,7 +5,7 @@ import os
 import sys
 from classes import scraping
 from classes.image_information import ImageInformation
-
+import csv
 
 def url_to_image(url: str) -> bytes:
     try:
@@ -69,15 +69,22 @@ def is_rule_004(image_info: ImageInformation) -> bool:
 
 # 以下 is_rule_*** をつくっていってください
 
-
 def check_all_rules(image_info: ImageInformation) -> list:
-    # すべてのルールを呼んできて、結果を配列に入れる
-    return [['画像サイズは600*600', True], ['アダルトではない', False]]
+    check_results = []
 
-def print_csv(image_info: ImageInformation,results: list) -> None:
-    #海斗さんよろしく
-    return
+    item_cd = image_info.item_code
 
+    #すべてのルールを呼んできて、結果を配列に入れる
+    check_results.append([item_cd,'is_rule_001',is_rule_001(image_info)])
+    check_results.append([item_cd,'is_rule_002',is_rule_002(image_info)])
+    check_results.append([item_cd,'is_rule_003',is_rule_003(image_info)])
+
+    return check_results
+
+def print_csv(check_results: list):
+    with open('test_print003.csv','a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(check_results)
 
 def main():
     lpm_url = "https://lohaco.jp/store/irisplaza/ksearch/?categoryLl=55"
@@ -87,12 +94,14 @@ def main():
         lpm_url, max_page)
 
     for array in scraping_html_array:
+        print('test')
         image = url_to_image(array[1])
         image_base64 = img_to_base64(image)
         google_json = get_json_from_googlecloud_vision_api(image_base64)
         image_info = ImageInformation(image,image_base64,google_json,array[0])
         results = check_all_rules(image_info)
-        print_csv(image_info,results)
+        path = "./"
+        print_csv(results)
 
 
 if __name__ == '__main__':

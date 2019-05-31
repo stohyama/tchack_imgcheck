@@ -2,7 +2,7 @@ from retry import retry
 from bs4 import BeautifulSoup
 import requests
 import os
-
+import time
 
 def get_url_exclude_extension(string_url):
     return_str = os.path.splitext(string_url)

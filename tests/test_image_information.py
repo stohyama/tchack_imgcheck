@@ -8,6 +8,5 @@ class TestImageInformation(unittest.TestCase):
         self.assertEqual(2, x.image_base64)
         self.assertEqual(3, x.google_vison_api_json)
 
-
 if __name__ == '__main__':
     unittest.main()

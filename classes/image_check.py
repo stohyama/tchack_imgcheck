@@ -52,7 +52,9 @@ def get_json_from_googlecloud_vision_api(image_base64):
 
 # 全L1画像共通加工ルール    背景色白の基本パターン    画像サイズ    縦：600px 横：600px
 def is_rule_001(image_info: ImageInformation) -> bool:
-    return True
+    im = image_info.image
+    width, height = im.size
+    return width == 600 and height == 600
 
 
 # 全L1画像共通加工ルール    背景色白の基本パターン    容量    50kb以下

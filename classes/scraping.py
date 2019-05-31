@@ -4,6 +4,7 @@ import requests
 import os
 import time
 
+
 def get_url_exclude_extension(string_url):
     return_str = os.path.splitext(string_url)
     return return_str[0], return_str[1]

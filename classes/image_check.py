@@ -3,8 +3,8 @@ import base64
 import json
 import os
 import sys
-import scraping
-from image_information import ImageInformation
+from classes import scraping
+from classes.image_information import ImageInformation
 import csv
 
 def url_to_image(url: str) -> bytes:
@@ -17,6 +17,7 @@ def url_to_image(url: str) -> bytes:
     except requests.exceptions.HTTPError:
         print('BadResponse')
     return img.content
+
 
 def img_to_base64(image: bytes) -> bytes:
     return base64.encodebytes(image)
@@ -49,11 +50,13 @@ def get_json_from_googlecloud_vision_api(image_base64):
     return res.json()
 
 
-def is_rule_001(image_info: ImageInformation) -> bool:  # 全L1画像共通加工ルール    背景色白の基本パターン    画像サイズ    縦：600px 横：600px
-    return False
+# 全L1画像共通加工ルール    背景色白の基本パターン    画像サイズ    縦：600px 横：600px
+def is_rule_001(image_info: ImageInformation) -> bool:
+    return True
 
 
-def is_rule_002(image_info: ImageInformation) -> bool:  # 全L1画像共通加工ルール    背景色白の基本パターン    容量    50kb以下
+# 全L1画像共通加工ルール    背景色白の基本パターン    容量    50kb以下
+def is_rule_002(image_info: ImageInformation) -> bool:
     return False
 
 
@@ -78,36 +81,28 @@ def check_all_rules(image_info: ImageInformation) -> list:
 
     return check_results
 
-def csv_output(check_results):
-    with open('test_print001.csv','w') as file:
+def print_csv(check_results: list):
+    with open('test_print003.csv','a', newline='') as file:
         writer = csv.writer(file)
-        writer = csv.writer(file, lineterminator='\n')
         writer.writerows(check_results)
 
 def main():
     lpm_url = "https://lohaco.jp/store/irisplaza/ksearch/?categoryLl=55"
     max_page = 100
 
-    scraping_html_array = scraping.return_scraping_html_array(lpm_url, max_page)
-    
-    #ここから繰り返し文。見る商品数分だけ繰り返す。
-    i = 0
-    for item_info in scraping_html_array
-    #while i <= len(scraping_html_array):
-        img = url_to_image(item_info[1])
-        img_base64 = img_to_base64(img)
-        googlecloud_vision_json = get_json_from_googlecloud_vision_api(img_base64)
-        #ImageInformationのインスタンスをつくるimage_info = ?
-        #results = check_all_rules(image_info)
-        #print_scv(image_info)
+    scraping_html_array = scraping.return_scraping_html_array(
+        lpm_url, max_page)
 
+    for array in scraping_html_array:
+        print('test')
+        image = url_to_image(array[1])
+        image_base64 = img_to_base64(image)
+        google_json = get_json_from_googlecloud_vision_api(image_base64)
+        image_info = ImageInformation(image,image_base64,google_json,array[0])
+        results = check_all_rules(image_info)
+        path = "./"
+        print_csv(results)
 
-        check_results = check_all_rules()  #画像チェックの呼び出し
-
-        csv_output(check_results) #csv掃き出しメソッド呼び出し
-
-        i += 1
-        #繰り返しここまで
 
 if __name__ == '__main__':
     main()

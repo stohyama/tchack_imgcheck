@@ -20,7 +20,7 @@ def url_to_image(url: str) -> bytes:
 
 
 def img_to_base64(image: bytes) -> bytes:
-    return base64.encodebytes(img_byte)
+    return base64.encodebytes(image)
 
 
 def get_json_from_googlecloud_vision_api(image_base64):
@@ -74,6 +74,10 @@ def check_all_rules(image_info: ImageInformation) -> list:
     # すべてのルールを呼んできて、結果を配列に入れる
     return [['画像サイズは600*600', True], ['アダルトではない', False]]
 
+def print_csv(image_info: ImageInformation,results: list) -> None:
+    #海斗さんよろしく
+    return
+
 
 def main():
     lpm_url = "https://lohaco.jp/store/irisplaza/ksearch/?categoryLl=55"
@@ -82,13 +86,13 @@ def main():
     scraping_html_array = scraping.return_scraping_html_array(
         lpm_url, max_page)
 
-    # ここからfor文
-    #img = url_to_image(hogehoge)
-    #img_base64 = img_to_base64(img)
-    #googlecloud_vision_json = get_json_from_googlecloud_vision_api(img_base64)
-    # ImageInformationのインスタンスをつくるimage_info = ?
-    #results = check_all_rules(image_info)
-    # print_scv(image_info)
+    for array in scraping_html_array:
+        image = url_to_image(array[1])
+        image_base64 = img_to_base64(image)
+        google_json = get_json_from_googlecloud_vision_api(image_base64)
+        image_info = ImageInformation(image,image_base64,google_json,array[0])
+        results = check_all_rules(image_info)
+        print_csv(image_info,results)
 
 
 if __name__ == '__main__':
